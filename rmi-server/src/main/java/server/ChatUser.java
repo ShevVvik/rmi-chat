@@ -1,18 +1,25 @@
 package server;
 
 
-public class ChatUser{
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+
+public class ChatUser {
 
     private String username;
-    private int id;
     private String userConnectionName;
     private IChatClient userConnection;
 
-    public ChatUser(String name) {
+    public ChatUser(String name) throws RemoteException, MalformedURLException, NotBoundException {
         this.username = name;
+        this.userConnectionName = "ConnectedUser_" + name;
+        this.userConnection = ( IChatClient ) Naming.lookup(this.userConnectionName);
+    }
 
-        this.id = ChatServerImpl.getNextId();
-        this.userConnectionName = "ConnectedUser_" + 2;
+    public String getUsername() {
+        return username;
     }
 
     public IChatClient getUserConnection() {

@@ -5,8 +5,8 @@ import java.rmi.RemoteException;
 
 public interface IChatServer extends Remote {
 
-    String addClient(String name) throws RemoteException;
-    void sendAll(String message) throws RemoteException;
-    String send(String message) throws RemoteException;
-
+    String connect(String name) throws RemoteException;
+    void disconnect(String name) throws RemoteException;
+    <T> void send(T mes, String username) throws RemoteException;
+    <T> void sendPrivate(String nameRecipient, T mes, String username) throws RemoteException;
 }
