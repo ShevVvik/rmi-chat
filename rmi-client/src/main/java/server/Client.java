@@ -7,13 +7,8 @@ public class Client{
 
 
     public static void main(String[] args) {
-        ClientImpl client = null;
-        try {
-            client = new ClientImpl();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        client.initializeConnection();
+        ChatController controller = new ChatController();
+        controller.start();
     }
 
 

@@ -52,7 +52,6 @@ public class ChatServerImpl implements IChatServer {
     @Override
     public <T> void send(T mes, String username) throws RemoteException {
         if (clientList == null) return;
-        System.out.println(mes);
         Date currentDate = new Date();
         Message<T> message = new Message<T>(currentDate, username,  mes);
 
@@ -64,10 +63,8 @@ public class ChatServerImpl implements IChatServer {
     @Override
     public <T> void sendPrivate(String nameRecipient, T mes, String username) throws RemoteException {
         if (clientList == null) return;
-
         Date currentDate = new Date();
         Message<T> message = new Message<T>(currentDate, username,  mes);
-
         for(ChatUser user: clientList) {
             if (user.getUsername().equals(nameRecipient)) {
                 user.getUserConnection().getMessageFromServer(message);
