@@ -12,12 +12,12 @@ import java.util.List;
 
 public class ChatServerImpl implements IChatServer {
 
-    private List<ChatUser> clientList;
     private IChatServer stub;
     private Registry registry;
+    private Sender sender;
 
     public ChatServerImpl() {
-        this.clientList = new LinkedList<>();
+        this.sender = new Sender();
     }
 
     void initializeServer() {
@@ -25,6 +25,7 @@ public class ChatServerImpl implements IChatServer {
             stub = (IChatServer) UnicastRemoteObject.exportObject(this, 0);
             registry = LocateRegistry.createRegistry(1099);
             registry.bind("Chat", stub);
+            this.sender.start();
             System.out.println("Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
@@ -36,7 +37,12 @@ public class ChatServerImpl implements IChatServer {
     public String connect(String name) {
         try {
             ChatUser newUser = new ChatUser(name);
-            this.clientList.add(newUser);
+            if (true){
+                this.sender.addRecipient(newUser);
+            } else {
+                return "This username is already taken";
+            }
+
         } catch (RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();
             return "Error with connection to server!";
@@ -45,31 +51,60 @@ public class ChatServerImpl implements IChatServer {
     }
 
     @Override
-    public void disconnect(String name) throws RemoteException {
-
+    public void disconnect(String name) {
+        ChatUser user = null;
+        try {
+            user = new ChatUser(name);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+        if (user != null) {
+            sender.removeRecipient(user);
+        }
     }
 
     @Override
     public <T> void send(T mes, String username) throws RemoteException {
-        if (clientList == null) return;
         Date currentDate = new Date();
         Message<T> message = new Message<T>(currentDate, username,  mes);
-
-        for(ChatUser user: clientList) {
-            user.getUserConnection().getMessageFromServer(message);
-        }
+        sender.addMessage(message);
     }
 
     @Override
     public <T> void sendPrivate(String nameRecipient, T mes, String username) throws RemoteException {
-        if (clientList == null) return;
         Date currentDate = new Date();
         Message<T> message = new Message<T>(currentDate, username,  mes);
-        for(ChatUser user: clientList) {
+        /*for(ChatUser user: se) {
             if (user.getUsername().equals(nameRecipient)) {
                 user.getUserConnection().getMessageFromServer(message);
             }
+        }*/
+    }
+/*
+    private ChatUser checkUserInUserList(ChatUser user) {
+        ChatUser result = null;
+        for(ChatUser u: clientList) {
+            if (u.equals(user)) {
+                result = u;
+                break;
+            }
         }
+        return user;
     }
 
+    private ChatUser checkUsernameInUserList(String username) {
+        ChatUser result = null;
+        for(ChatUser u: clientList) {
+            if (u.getUsername().equals(username)) {
+                result = u;
+                break;
+            }
+        }
+        return result;
+    }
+*/
 }
