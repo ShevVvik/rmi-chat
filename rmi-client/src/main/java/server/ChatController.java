@@ -13,8 +13,8 @@ public class ChatController {
         System.out.println("Simple RMI chat application");
         System.out.print("Enter username: ");
         username = input.nextLine();
-
-        while (true) {
+        boolean exit = false;
+        while (!exit) {
             StringBuilder command = new StringBuilder(input.nextLine());
             switch(parse(command)) {
                 case HELP: {
@@ -36,6 +36,16 @@ public class ChatController {
                 case PRIVATE_MESSAGE: {
                     privateMessageCommand(command);
                 } break;
+                case USER_LIST: {
+                    /*
+                    PLACE FOR API
+                     */
+                } break;
+                case EXIT: {
+                    exit = true;
+                } default: {
+
+                }
             }
         }
 
@@ -65,8 +75,7 @@ public class ChatController {
     private void commonMessageCommand(StringBuilder message) {
         if (!connection) {
             System.out.println("Connection: false");
-        }
-        if (!connector.send(message.toString())) {
+        } else if (!connector.send(message.toString())) {
             System.out.println("Sorry, we have problems sending a message.");
         };
     }
@@ -74,13 +83,13 @@ public class ChatController {
     private void privateMessageCommand(StringBuilder message) {
         if (!connection) {
             System.out.println("Connection: false");
+        } else {
+            String usernameRecipient = parsePrivateMessage(message);
+
+            if (!connector.sendPrivateMessage(message.toString(), usernameRecipient)) {
+                System.out.println("Sorry, we have problems sending a message.");
+            };
         }
-
-        String usernameRecipient = parsePrivateMessage(message);
-
-        if (!connector.sendPrivateMessage(message.toString(), usernameRecipient)) {
-            System.out.println("Sorry, we have problems sending a message.");
-        };
     }
 
     private String parsePrivateMessage(StringBuilder message) {
@@ -110,6 +119,14 @@ public class ChatController {
         {
             row.replace(0, 10, "");
             return  ControlCommand.DISCONNECT;
+        }
+        if(row.indexOf("/users") == 0)
+        {
+            return  ControlCommand.USER_LIST;
+        }
+        if(row.indexOf("/exit") == 0)
+        {
+            return  ControlCommand.EXIT;
         }
         return ControlCommand.COMMON_MESSAGE;
     }

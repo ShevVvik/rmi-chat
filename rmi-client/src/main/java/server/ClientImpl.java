@@ -13,8 +13,8 @@ public class ClientImpl extends UnicastRemoteObject implements IChatClient, Seri
     }
 
     @Override
-    public String getMessageFromServer(Message message) throws RemoteException {
-        System.out.println(message.toString());
-        return message.toString();
+    public String getMessageFromServer(String commonMessage) throws RemoteException {
+        System.out.println(commonMessage);
+        return commonMessage.toString();
     }
 }

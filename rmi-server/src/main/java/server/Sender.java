@@ -12,12 +12,6 @@ public class Sender extends Thread {
     private BlockingQueue<Message> messageList;
     private List<ChatUser> listRecipient;
 
-    public Sender(Message message, List<ChatUser> listRecipient) {
-        this();
-        this.messageList.add(message);
-        this.listRecipient = new CopyOnWriteArrayList<ChatUser>(listRecipient);
-    }
-
     public Sender() {
         messageList = new LinkedBlockingQueue<>();
         listRecipient = new CopyOnWriteArrayList<ChatUser>();
@@ -60,8 +54,26 @@ public class Sender extends Thread {
         }
     }
 
+    public void sendPrivateMessage(Message message, String nameRecipient) {
+        for(ChatUser user: listRecipient) {
+            if (user.getUsername().equals(nameRecipient)) {
+                try {
+                    user.getUserConnection().getMessageFromServer(message.print());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+    }
 
-    public void removeRecipient(ChatUser user) {
+    public void removeRecipient(ChatUser userToDisconnect) {
+        for(ChatUser user: listRecipient) {
+            if (user.equals(userToDisconnect)) {
+                listRecipient.remove(user);
+                break;
+            }
+        }
     }
 
     class HelperWithSend extends Thread {
@@ -79,7 +91,7 @@ public class Sender extends Thread {
             Iterator<ChatUser> iterator = sublistRecipient.iterator();
             while (iterator.hasNext()) {
                 try {
-                    iterator.next().getUserConnection().getMessageFromServer(message);
+                    iterator.next().getUserConnection().getMessageFromServer(message.print());
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

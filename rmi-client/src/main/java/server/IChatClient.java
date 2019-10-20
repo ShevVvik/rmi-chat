@@ -5,6 +5,6 @@ import java.rmi.RemoteException;
 
 public interface IChatClient extends Remote {
 
-    String getMessageFromServer(Message message) throws RemoteException;
+    String getMessageFromServer(String commonMessage) throws RemoteException;
 
 }

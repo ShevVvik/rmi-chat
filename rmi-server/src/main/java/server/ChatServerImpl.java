@@ -7,8 +7,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 public class ChatServerImpl implements IChatServer {
 
@@ -28,7 +26,6 @@ public class ChatServerImpl implements IChatServer {
             this.sender.start();
             System.out.println("Server ready");
         } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
     }
@@ -39,10 +36,10 @@ public class ChatServerImpl implements IChatServer {
             ChatUser newUser = new ChatUser(name);
             if (true){
                 this.sender.addRecipient(newUser);
+                sendTechnicalMessage(name + " connected to the server!");
             } else {
                 return "This username is already taken";
             }
-
         } catch (RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();
             return "Error with connection to server!";
@@ -55,56 +52,31 @@ public class ChatServerImpl implements IChatServer {
         ChatUser user = null;
         try {
             user = new ChatUser(name);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (NotBoundException e) {
+        } catch (RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();
         }
         if (user != null) {
             sender.removeRecipient(user);
+            sendTechnicalMessage(name + " has left the server!");
         }
     }
 
     @Override
-    public <T> void send(T mes, String username) throws RemoteException {
+    public <T> void send(T mes, String username) {
         Date currentDate = new Date();
-        Message<T> message = new Message<T>(currentDate, username,  mes);
+        Message<T> message = new CommonMessage<T>(currentDate, username,  mes);
         sender.addMessage(message);
     }
 
     @Override
-    public <T> void sendPrivate(String nameRecipient, T mes, String username) throws RemoteException {
+    public <T> void sendPrivate(String nameRecipient, T mes, String username) {
         Date currentDate = new Date();
-        Message<T> message = new Message<T>(currentDate, username,  mes);
-        /*for(ChatUser user: se) {
-            if (user.getUsername().equals(nameRecipient)) {
-                user.getUserConnection().getMessageFromServer(message);
-            }
-        }*/
-    }
-/*
-    private ChatUser checkUserInUserList(ChatUser user) {
-        ChatUser result = null;
-        for(ChatUser u: clientList) {
-            if (u.equals(user)) {
-                result = u;
-                break;
-            }
-        }
-        return user;
+        Message<T> message = new CommonMessage<T>(currentDate, username,  mes);
+        sender.sendPrivateMessage(message, nameRecipient);
     }
 
-    private ChatUser checkUsernameInUserList(String username) {
-        ChatUser result = null;
-        for(ChatUser u: clientList) {
-            if (u.getUsername().equals(username)) {
-                result = u;
-                break;
-            }
-        }
-        return result;
+    private void sendTechnicalMessage(String textMessage) {
+        Message message = new TechnicalMessage();
+        sender.addMessage(message);
     }
-*/
 }

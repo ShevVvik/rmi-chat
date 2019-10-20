@@ -1,15 +1,16 @@
 package server;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Message<T> implements Serializable {
+public class CommonMessage<T> extends Message implements Serializable {
 
     protected Date timeMessage;
     protected String nameAuthor;
     protected T content;
 
-    public Message(Date timeMessage, String nameAuthor, T content) {
+    public CommonMessage(Date timeMessage, String nameAuthor, T content) {
         this.timeMessage = timeMessage;
         this.nameAuthor = nameAuthor;
         this.content = content;
@@ -32,5 +33,12 @@ public class Message<T> implements Serializable {
         return timeMessage +
                 " - " + nameAuthor +
                 ": " + content;
+    }
+
+    @Override
+    String print() {
+        SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
+        String result = date.format(this.timeMessage) + " - " + nameAuthor + ": " + this.content;
+        return result;
     }
 }
