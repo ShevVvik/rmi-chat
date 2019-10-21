@@ -3,6 +3,7 @@ package server;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class CommonMessage<T> extends Message implements Serializable {
 
@@ -11,21 +12,14 @@ public class CommonMessage<T> extends Message implements Serializable {
     protected T content;
 
     public CommonMessage(Date timeMessage, String nameAuthor, T content) {
+        this(timeMessage, nameAuthor, content, null);
+    }
+
+    public CommonMessage(Date timeMessage, String nameAuthor, T content, List<ChatUser> recipients) {
         this.timeMessage = timeMessage;
         this.nameAuthor = nameAuthor;
         this.content = content;
-    }
-
-    public Date getTimeMessage() {
-        return timeMessage;
-    }
-
-    public String getNameAuthor() {
-        return nameAuthor;
-    }
-
-    public T getContent() {
-        return content;
+        this.listRecipient = recipients;
     }
 
     @Override
@@ -33,6 +27,11 @@ public class CommonMessage<T> extends Message implements Serializable {
         return timeMessage +
                 " - " + nameAuthor +
                 ": " + content;
+    }
+
+    @Override
+    List<ChatUser> getListRecipient() {
+        return listRecipient;
     }
 
     @Override

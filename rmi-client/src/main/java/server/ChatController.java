@@ -10,15 +10,15 @@ public class ChatController {
 
     public void start() {
         Scanner input = new Scanner(System.in);
-        System.out.println("Simple RMI chat application");
+        System.out.println("Simple RMI chat application" +
+                "\nUse /help to get info");
         System.out.print("Enter username: ");
         username = input.nextLine();
-        boolean exit = false;
-        while (!exit) {
+        while (true) {
             StringBuilder command = new StringBuilder(input.nextLine());
             switch(parse(command)) {
                 case HELP: {
-                    System.out.println("Command list for chat:\n" +
+                    System.out.println("\nCommand list for chat:\n" +
                             "/connect - use to connect to server\n" +
                             "/disconnect - use to disconnect\n" +
                             "/pm <USERNAME> - use to send private message\n" +
@@ -42,7 +42,8 @@ public class ChatController {
                      */
                 } break;
                 case EXIT: {
-                    exit = true;
+                    disconnectionCommand();
+                    System.exit(0);
                 } default: {
 
                 }
@@ -52,7 +53,7 @@ public class ChatController {
     }
 
     private void connectionCommand() {
-        System.out.println("Connection to server:");
+        System.out.println("\nConnection to server:");
         connector = new Connector(username);
         if(connector.connect()) {
             System.out.println("Welcome, " + username + "!");
@@ -64,17 +65,19 @@ public class ChatController {
 
     private void disconnectionCommand() {
         if (!connection) {
-            System.out.println("Connection: false");
+            System.out.println("\nConnection: false");
+        } else {
+            System.out.println("\nDisconnecting from the server...");
+            connector.disconnect();
+            System.out.println("Disconnect successful!");
+            connection = false;
         }
-        System.out.println("Disconnecting from the server...");
-        connector.disconnect();
-        System.out.println("Disconnect successful!");
-        connection = false;
     }
 
     private void commonMessageCommand(StringBuilder message) {
         if (!connection) {
-            System.out.println("Connection: false");
+            System.out.println("Connection: false\n" +
+                    "use /connect to connect to the server");
         } else if (!connector.send(message.toString())) {
             System.out.println("Sorry, we have problems sending a message.");
         };

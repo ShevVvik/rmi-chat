@@ -10,27 +10,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Sender extends Thread {
 
     private BlockingQueue<Message> messageList;
-    private List<ChatUser> listRecipient;
 
     public Sender() {
         messageList = new LinkedBlockingQueue<>();
-        listRecipient = new CopyOnWriteArrayList<ChatUser>();
     }
 
     public void addMessage(Message message) {
         this.messageList.add(message);
     }
 
-    public void addRecipient(ChatUser recipient) {
-        this.listRecipient.add(recipient);
-    }
-
-
     @Override
     public void run() {
         while (true) {
             try {
                 Message mes = messageList.take();
+                List<ChatUser> listRecipient = mes.getListRecipient();
                 int numberOfTask = listRecipient.size();
                 int numberOfThread = 4;
                 if (numberOfTask >= 4) {
@@ -50,28 +44,6 @@ public class Sender extends Thread {
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    public void sendPrivateMessage(Message message, String nameRecipient) {
-        for(ChatUser user: listRecipient) {
-            if (user.getUsername().equals(nameRecipient)) {
-                try {
-                    user.getUserConnection().getMessageFromServer(message.print());
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-    }
-
-    public void removeRecipient(ChatUser userToDisconnect) {
-        for(ChatUser user: listRecipient) {
-            if (user.equals(userToDisconnect)) {
-                listRecipient.remove(user);
-                break;
             }
         }
     }

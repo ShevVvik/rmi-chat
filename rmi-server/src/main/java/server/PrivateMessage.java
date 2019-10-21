@@ -2,28 +2,30 @@ package server;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PrivateMessage<T> extends CommonMessage {
-    private String nameRecipient;
 
-    public PrivateMessage(Date timeMessage, String nameAuthor, Object content, String nameRecipient) {
+    private ChatUser recipient;
+
+    public PrivateMessage(Date timeMessage, String nameAuthor, T content, ChatUser recipient) {
         super(timeMessage, nameAuthor, content);
-        this.nameRecipient = nameRecipient;
+        this.recipient = recipient;
     }
 
-    public String getNameRecipient() {
-        return nameRecipient;
-    }
-
-    public void setNameRecipient(String nameRecipient) {
-        this.nameRecipient = nameRecipient;
+    @Override
+    public List<ChatUser> getListRecipient() {
+        List<ChatUser> listRecipient = new CopyOnWriteArrayList<>();
+        listRecipient.add(recipient);
+        return listRecipient;
     }
 
     @Override
     public String toString() {
         return timeMessage +
                 " - " + nameAuthor +
-                "(to " + nameRecipient +
+                "(to " + listRecipient +
                 "): " + content;
     }
 
@@ -31,7 +33,7 @@ public class PrivateMessage<T> extends CommonMessage {
     public String print() {
         SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
         String result = date.format(this.timeMessage) + " - " + nameAuthor +
-                " (to " + nameRecipient + "): " + this.content;
+                " (to " + recipient.getUsername() + "): " + this.content;
         return result;
     }
 }
