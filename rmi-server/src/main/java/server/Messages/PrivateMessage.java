@@ -1,4 +1,6 @@
-package server;
+package server.Messages;
+
+import server.ChatUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

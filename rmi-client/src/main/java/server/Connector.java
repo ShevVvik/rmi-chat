@@ -4,10 +4,13 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 import java.util.Scanner;
 
 public class Connector {
 
+    private String hostname;
+    private int port;
 
     private Registry registry;
     private String username;
@@ -21,9 +24,9 @@ public class Connector {
         try {
             Scanner input = new Scanner(System.in);
             System.out.print("Host: ");
-            String hostname = input.nextLine();
+            hostname = input.nextLine();
             System.out.print("Port: ");
-            int port = input.nextInt();
+            port = input.nextInt();
             registry = LocateRegistry.getRegistry(hostname, port);
             ClientImpl client = new ClientImpl();
             registry.rebind("ConnectedUser_" + username, client);
@@ -69,6 +72,14 @@ public class Connector {
         return true;
     }
 
-
+    public List<String> getUserList() {
+        List<String> userList = null;
+        try {
+            userList = stub.getUserList();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return userList;
+    }
 
 }

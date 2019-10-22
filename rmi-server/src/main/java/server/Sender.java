@@ -1,10 +1,11 @@
 package server;
 
+import server.Messages.Message;
+
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Sender extends Thread {

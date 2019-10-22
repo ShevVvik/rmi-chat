@@ -1,5 +1,6 @@
 package server;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ChatController {
@@ -13,7 +14,7 @@ public class ChatController {
         System.out.println("Simple RMI chat application" +
                 "\nUse /help to get info");
         System.out.print("Enter username: ");
-        username = input.nextLine();
+        username = input.nextLine().split(" ")[0];
         while (true) {
             StringBuilder command = new StringBuilder(input.nextLine());
             switch(parse(command)) {
@@ -37,9 +38,7 @@ public class ChatController {
                     privateMessageCommand(command);
                 } break;
                 case USER_LIST: {
-                    /*
-                    PLACE FOR API
-                     */
+                    userListCommand();
                 } break;
                 case EXIT: {
                     disconnectionCommand();
@@ -50,6 +49,14 @@ public class ChatController {
             }
         }
 
+    }
+
+    private void userListCommand() {
+        List<String> userList = connector.getUserList();
+        System.out.println("User list: ");
+        for(String user: userList) {
+            System.out.println(user);
+        }
     }
 
     private void connectionCommand() {

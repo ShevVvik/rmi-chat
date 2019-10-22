@@ -1,14 +1,25 @@
 package server;
 
+import server.Messages.CommonMessage;
+import server.Messages.Message;
+import server.Messages.PrivateMessage;
+import server.Messages.TechnicalMessage;
+
 import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+/*
+
+ */
 
 public class ChatServerImpl implements IChatServer {
 
@@ -29,9 +40,13 @@ public class ChatServerImpl implements IChatServer {
             this.sender.start();
             listRecipient = new CopyOnWriteArrayList<ChatUser>();
             System.out.println("Server ready");
-        } catch (Exception e) {
+        } catch (RemoteException | AlreadyBoundException e) {
+            /*
+
+             */
             e.printStackTrace();
         }
+
     }
 
     @Override
@@ -42,8 +57,8 @@ public class ChatServerImpl implements IChatServer {
                 /*
                 Сперва отправить оповещение, потом добавить
                  */
-                listRecipient.add(newUser);
                 sendTechnicalMessage(name + " connected to the server!");
+                listRecipient.add(newUser);
             } else {
                 return "This username is already taken";
             }
@@ -92,5 +107,14 @@ public class ChatServerImpl implements IChatServer {
     private void sendTechnicalMessage(String textMessage) {
         Message message = new TechnicalMessage(textMessage, listRecipient);
         sender.addMessage(message);
+    }
+
+    @Override
+    public List<String> getUserList() {
+        List<String> list = new ArrayList<>();
+        for(ChatUser user: listRecipient) {
+            list.add(user.getUsername());
+        }
+        return list;
     }
 }
