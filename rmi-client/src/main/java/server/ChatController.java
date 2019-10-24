@@ -10,11 +10,11 @@ public class ChatController {
     private boolean connection;
 
     public void start() {
+        connector = new Connector();
         Scanner input = new Scanner(System.in);
         System.out.println("Simple RMI chat application" +
                 "\nUse /help to get info");
-        System.out.print("Enter username: ");
-        username = input.nextLine().split(" ")[0];
+
         while (true) {
             StringBuilder command = new StringBuilder(input.nextLine());
             switch(parse(command)) {
@@ -23,6 +23,7 @@ public class ChatController {
                             "/connect - use to connect to server\n" +
                             "/disconnect - use to disconnect\n" +
                             "/pm <USERNAME> - use to send private message\n" +
+                            "/auto - use to auto-connect to last server\n" +
                             "/exit - exit from application");
                 } break;
                 case CONNECT: {
@@ -40,6 +41,9 @@ public class ChatController {
                 case USER_LIST: {
                     userListCommand();
                 } break;
+                case AUTO_LOGIN: {
+                    autoLoginCommand();
+                } break;
                 case EXIT: {
                     disconnectionCommand();
                     System.exit(0);
@@ -49,6 +53,10 @@ public class ChatController {
             }
         }
 
+    }
+
+    private void autoLoginCommand() {
+        connector.connect(AutiLoginUttil.loadConnectionData());
     }
 
     private void userListCommand() {
@@ -61,7 +69,6 @@ public class ChatController {
 
     private void connectionCommand() {
         System.out.println("\nConnection to server:");
-        connector = new Connector(username);
         if(connector.connect()) {
             System.out.println("Welcome, " + username + "!");
             connection = true;
@@ -131,6 +138,10 @@ public class ChatController {
             return  ControlCommand.DISCONNECT;
         }
         if(row.indexOf("/users") == 0)
+        {
+            return  ControlCommand.USER_LIST;
+        }
+        if(row.indexOf("/auto") == 0)
         {
             return  ControlCommand.USER_LIST;
         }

@@ -32,12 +32,12 @@ public class CommonMessage<T> extends Message implements Serializable {
     }
 
     @Override
-    List<ChatUser> getListRecipient() {
+    public List<ChatUser> getListRecipient() {
         return listRecipient;
     }
 
     @Override
-    String print() {
+    public String print() {
         SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
         String result = date.format(this.timeMessage) + " - " + nameAuthor + ": " + this.content;
         return result;

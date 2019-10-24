@@ -29,7 +29,7 @@ public class ChatServerImpl implements IChatServer {
     private List<ChatUser> listRecipient;
 
     public ChatServerImpl() {
-        this.sender = new Sender();
+        this.sender = new Sender(this);
     }
 
     void initializeServer() {
@@ -41,9 +41,6 @@ public class ChatServerImpl implements IChatServer {
             listRecipient = new CopyOnWriteArrayList<ChatUser>();
             System.out.println("Server ready");
         } catch (RemoteException | AlreadyBoundException e) {
-            /*
-
-             */
             e.printStackTrace();
         }
 
@@ -54,9 +51,6 @@ public class ChatServerImpl implements IChatServer {
         try {
             ChatUser newUser = new ChatUser(name);
             if (true){
-                /*
-                Сперва отправить оповещение, потом добавить
-                 */
                 sendTechnicalMessage(name + " connected to the server!");
                 listRecipient.add(newUser);
             } else {
@@ -100,7 +94,6 @@ public class ChatServerImpl implements IChatServer {
                 break;
             }
         }
-
         sender.addMessage(message);
     }
 

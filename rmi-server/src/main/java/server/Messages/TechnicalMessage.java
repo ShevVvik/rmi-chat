@@ -12,12 +12,12 @@ public class TechnicalMessage extends Message {
     }
 
     @Override
-    List<ChatUser> getListRecipient() {
+    public List<ChatUser> getListRecipient() {
         return listRecipient;
     }
 
     @Override
-    String print() {
+    public String print() {
         return content.toString();
     }
 }

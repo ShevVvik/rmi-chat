@@ -11,9 +11,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Sender extends Thread {
 
     private BlockingQueue<Message> messageList;
+    private ChatServerImpl server;
 
-    public Sender() {
+    public Sender(ChatServerImpl server) {
         messageList = new LinkedBlockingQueue<>();
+        this.server = server;
     }
 
     public void addMessage(Message message) {
@@ -63,9 +65,11 @@ public class Sender extends Thread {
         public void run() {
             Iterator<ChatUser> iterator = sublistRecipient.iterator();
             while (iterator.hasNext()) {
+                ChatUser user = iterator.next();
                 try {
-                    iterator.next().getUserConnection().getMessageFromServer(message.print());
+                    user.getUserConnection().getMessageFromServer(message.print());
                 } catch (RemoteException e) {
+                    server.disconnect(user.getUsername());
                     e.printStackTrace();
                 }
             }

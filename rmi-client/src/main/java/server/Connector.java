@@ -9,40 +9,42 @@ import java.util.Scanner;
 
 public class Connector {
 
-    private String hostname;
-    private int port;
+    private ConnectionData connectionData;
 
     private Registry registry;
-    private String username;
     private IChatServer stub;
 
-    public Connector(String username) {
-        this.username = username;
+    public boolean connect() {
+        connectionData = new ConnectionData();
+        Scanner input = new Scanner(System.in);
+        System.out.print("Host: ");
+        connectionData.setHostname(input.nextLine());
+        System.out.print("Port: ");
+        connectionData.setPort(input.nextInt());
+        System.out.print("Enter username: ");
+        connectionData.setUsername(input.nextLine().split(" ")[0]);
+        return connect(connectionData);
     }
 
-    public boolean connect() {
+    public boolean connect(ConnectionData connectionData) {
         try {
-            Scanner input = new Scanner(System.in);
-            System.out.print("Host: ");
-            hostname = input.nextLine();
-            System.out.print("Port: ");
-            port = input.nextInt();
-            registry = LocateRegistry.getRegistry(hostname, port);
+            registry = LocateRegistry.getRegistry(connectionData.getHostname(), connectionData.getPort());
             ClientImpl client = new ClientImpl();
-            registry.rebind("ConnectedUser_" + username, client);
+            registry.rebind("ConnectedUser_" + connectionData.getUsername(), client);
             stub = (IChatServer) registry.lookup("Chat");
-            stub.connect(username);
+            stub.connect(connectionData.getUsername());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+        AutiLoginUttil.saveConnectionData(connectionData);
         return true;
     }
 
     public boolean disconnect() {
         try {
-            stub.disconnect(username);
-            registry.unbind("ConnectedUser_" + username);
+            stub.disconnect(connectionData.getUsername());
+            registry.unbind("ConnectedUser_" + connectionData.getUsername());
             stub = null;
             registry = null;
         } catch (RemoteException | NotBoundException e) {
@@ -54,7 +56,7 @@ public class Connector {
 
     public boolean send(String message) {
         try {
-            stub.send(message, username);
+            stub.send(message, connectionData.getUsername());
         } catch (RemoteException e) {
             e.printStackTrace();
             return false;
@@ -64,7 +66,7 @@ public class Connector {
 
     public boolean sendPrivateMessage(String message, String usernameRecipient) {
         try {
-            stub.sendPrivate(usernameRecipient, message, username);
+            stub.sendPrivate(usernameRecipient, message, connectionData.getUsername());
         } catch (RemoteException e) {
             e.printStackTrace();
             return false;
